@@ -7,7 +7,7 @@ import { cookies } from "next/headers";
 
 const sk = process.env.NEXT_PUBLIC_JWT_SECRET_KEY || ""
 
-export async function handlePurchase(items: CartProduct[] | CartProduct) {
+export async function handlePurchase(items: CartProduct[] | CartProduct, origin: string) {
     const products = Array.isArray(items) ? items : [items]
     const line_items = products.map(product => ({
         quantity: product.count,
@@ -27,8 +27,8 @@ export async function handlePurchase(items: CartProduct[] | CartProduct) {
     const session = await stripe.checkout.sessions.create({
         line_items,
         mode: "payment",
-        success_url: "http://localhost:3000/success",
-        cancel_url: "http://localhost:3000"
+        success_url: `${origin}/success`,
+        cancel_url: `${origin}`
     })
     if(!session.url) return
     redirect(session.url)
